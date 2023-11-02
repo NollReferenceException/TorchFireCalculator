@@ -17,11 +17,8 @@ public class FireCalculator {
     ArrayList<Double> inflationRates;
 
 
-
-    public FireCalculator(int chillYear, int highLimitYear)
-    {
+    public FireCalculator(int chillYear, int highLimitYear) {
         lifeYears = (highLimitYear + 1) - chillYear;
-
         startingIndexInflationRate = Constants.INFLATION_RATE.length - 1 - lifeYears;
         startingIndexMoexRate = Constants.MOEX_RATE.length - 1 - lifeYears;
 
@@ -31,55 +28,45 @@ public class FireCalculator {
         cyclesCounter = 0;
     }
 
-    private float calculateMaxWithdrawalPercent()
-    {
-        if(lifeYears == 1)
-        {
+    private float calculateMaxWithdrawalPercent() {
+        if (lifeYears == 1) {
             return 100.0F;
         }
 
         double calculatedPercent = calculateApproximatePercent();
 
         boolean found;
-        while (true)
-        {
+        while (true) {
             cyclesCounter++;
 
             found = checkPercentForMaximality(calculatedPercent);
 
-            if (found)
-            {
+            if (found) {
                 break;
             }
 
             calculatedPercent -= 0.5f;
         }
 
-        maxWithdrawalPercent = (float)calculatedPercent;
+        maxWithdrawalPercent = (float) calculatedPercent;
         return maxWithdrawalPercent;
     }
 
-    private double calculateApproximatePercent()
-    {
+    private double calculateApproximatePercent() {
         double capital = startingCapitalAmount;
         double moexImpact;
         double approximatePercent = 100.0;
         double currentInflationRate;
         double currentMoexRate;
 
-        if(startingIndexMoexRate == 0)
-        {
+        if (startingIndexMoexRate == 0) {
             currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate];
-        }
-        else
-        {
+        } else {
             currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate - 1];
         }
 
-        for(int i = 0; i < lifeYears; i++)
-        {
-            if(i == lifeYears - 1)
-            {
+        for (int i = 0; i < lifeYears; i++) {
+            if (i == lifeYears - 1) {
                 approximatePercent = capital / (lifeYears);
             }
 
@@ -101,16 +88,13 @@ public class FireCalculator {
         return approximatePercent;
     }
 
-    private boolean checkPercentForMaximality(double maxPercentCandidate)
-    {
+    private boolean checkPercentForMaximality(double maxPercentCandidate) {
         double capital = startingCapitalAmount;
 
-        for(int i = 0; i < lifeYears; i++)
-        {
+        for (int i = 0; i < lifeYears; i++) {
             capital -= maxPercentCandidate;
 
-            if(capital < 0)
-            {
+            if (capital < 0) {
                 return false;
             }
 
@@ -121,13 +105,11 @@ public class FireCalculator {
         return true;
     }
 
-    public float getMaxWithdrawalPercent()
-    {
+    public float getMaxWithdrawalPercent() {
         return calculateMaxWithdrawalPercent();
     }
 
-    public int getCyclesCount()
-    {
+    public int getCyclesCount() {
         return cyclesCounter;
     }
 }

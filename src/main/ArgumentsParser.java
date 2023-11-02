@@ -20,8 +20,7 @@ public class ArgumentsParser {
             if (lowLimitYear <= year && year <= highLimitYear) {
                 validatedArgs.add(year);
             } else {
-                throw new RuntimeException(
-                        String.format("Значение должно находиться в пределах: от %d до %d", lowLimitYear, highLimitYear));
+                throw new RuntimeException(String.format("Значение должно находиться в пределах: от %d до %d", lowLimitYear, highLimitYear));
             }
         }
 
