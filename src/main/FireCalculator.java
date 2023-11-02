@@ -88,7 +88,7 @@ public class FireCalculator {
     }
 
     private boolean checkPercentForMaximality(double maxPercentCandidate, RatesData ratesData) {
-        calculatorStatistic.incrementCheckCount();
+        calculatorStatistic.incrementChecksCount();
 
         double capital = STARTING_CAPITAL_AMOUNT;
 

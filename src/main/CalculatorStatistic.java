@@ -3,7 +3,7 @@ package main;
 public class CalculatorStatistic {
     private int checksCount;
 
-    public void incrementCheckCount(){
+    public void incrementChecksCount(){
         checksCount++;
     }
 
