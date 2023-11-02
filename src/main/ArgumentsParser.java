@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class ArgumentsParser {
     private final int lowLimitYear = Constants.LOW_LIMIT_YEAR;
     private final int highLimitYear = Constants.HIGH_LIMIT_YEAR;
-    private String[] srcArgs;
+    private final String[] srcArgs;
 
     public ArgumentsParser(String[] args) {
         srcArgs = args;

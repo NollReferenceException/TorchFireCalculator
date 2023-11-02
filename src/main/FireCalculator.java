@@ -6,22 +6,24 @@ public class FireCalculator {
 
     private final Double startingCapitalAmount = 100.0;
     private final float accuracyFactor = 3.0F;
+    private final int lifeYears;
+    private final int startingIndexInflationRate;
+    private final int startingIndexMoexRate;
 
-    private float maxWithdrawalPercent;
-    private int lifeYears;
-    private int firstIndexInflationRate;
-    private int firstIndexMoexRate;
     private int cyclesCounter;
+    private float maxWithdrawalPercent;
 
     ArrayList<Double> moexImpacts;
     ArrayList<Double> inflationRates;
+
+
 
     public FireCalculator(int chillYear, int highLimitYear)
     {
         lifeYears = (highLimitYear + 1) - chillYear;
 
-        firstIndexInflationRate = Constants.INFLATION_RATE.length - 1 - lifeYears;
-        firstIndexMoexRate = Constants.MOEX_RATE.length - 1 - lifeYears;
+        startingIndexInflationRate = Constants.INFLATION_RATE.length - 1 - lifeYears;
+        startingIndexMoexRate = Constants.MOEX_RATE.length - 1 - lifeYears;
 
         moexImpacts = new ArrayList<>();
         inflationRates = new ArrayList<>();
@@ -65,13 +67,13 @@ public class FireCalculator {
         double currentInflationRate;
         double currentMoexRate;
 
-        if(firstIndexMoexRate == 0)
+        if(startingIndexMoexRate == 0)
         {
-            currentMoexRate = Constants.MOEX_RATE[firstIndexMoexRate];
+            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate];
         }
         else
         {
-            currentMoexRate = Constants.MOEX_RATE[firstIndexMoexRate - 1];
+            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate - 1];
         }
 
         for(int i = 0; i < lifeYears; i++)
@@ -83,8 +85,8 @@ public class FireCalculator {
 
             double prevousMoexRate = currentMoexRate;
 
-            currentInflationRate = Constants.INFLATION_RATE[firstIndexInflationRate + i] / 100;
-            currentMoexRate = Constants.MOEX_RATE[firstIndexMoexRate + i];
+            currentInflationRate = Constants.INFLATION_RATE[startingIndexInflationRate + i] / 100;
+            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate + i];
 
             moexImpact = currentMoexRate / prevousMoexRate;
             capital -= capital * currentInflationRate;
