@@ -34,11 +34,15 @@ class FireCalculatorTest {
 
 
     }, ignoreLeadingAndTrailingWhitespace = true)
-    void fullTest(int input, float output) {
+    public void fullTest(int input, float output) {
         {
-            FireCalculator fireCalculator = new FireCalculator(input, Constants.HIGH_LIMIT_YEAR);
+            FireCalculator fireCalculator =
+                    new FireCalculator(input, Constants.HIGH_LIMIT_YEAR);
+
             assertEquals(output, fireCalculator.getMaxWithdrawalPercent());
-            System.out.printf("%d : количество проходов - %d%n", input, fireCalculator.getCyclesCount());
+
+            System.out.printf("%d : количество проходов - %d%n",
+                    input, fireCalculator.getCyclesCount());
         }
     }
 }

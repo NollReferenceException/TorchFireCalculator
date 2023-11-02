@@ -6,6 +6,7 @@ package main;
  */
 public class Constants {
 
+    public static final double MAX_PERCENT_VALUE = 100.0;
     public static final int LOW_LIMIT_YEAR = 2002;
     public static final int HIGH_LIMIT_YEAR = 2021;
 
