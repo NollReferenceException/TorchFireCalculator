@@ -60,10 +60,19 @@ public class FireCalculator {
     private double calculateApproximatePercent()
     {
         double capital = startingCapitalAmount;
-        double currentInflationRate;
-        double currentMoexRate = Constants.MOEX_RATE[firstIndexMoexRate];
         double moexImpact;
         double approximatePercent = 100.0;
+        double currentInflationRate;
+        double currentMoexRate;
+
+        if(firstIndexMoexRate == 0)
+        {
+            currentMoexRate = Constants.MOEX_RATE[firstIndexMoexRate];
+        }
+        else
+        {
+            currentMoexRate = Constants.MOEX_RATE[firstIndexMoexRate - 1];
+        }
 
         for(int i = 0; i < lifeYears; i++)
         {
