@@ -78,8 +78,11 @@ public class FireCalculator {
                 approximatePercent = (capital / (lifeYears));
             }
 
-            capital *= (1 - ratesData.inflationRates().get(i));
-            capital *= ratesData.moexImpacts().get(i);
+            double currentinflationRate = ratesData.inflationRates().get(i);
+            capital *= (1 - currentinflationRate);
+
+            double currentmoexImpacts = ratesData.moexImpacts().get(i);
+            capital *= currentmoexImpacts;
         }
 
         approximatePercent = Math.ceil(approximatePercent);
@@ -99,7 +102,10 @@ public class FireCalculator {
                 return false;
             }
 
-            maxPercentCandidate *= (1 + ratesData.inflationRates().get(i));
+            double currentinflationRate = ratesData.inflationRates().get(i);
+            maxPercentCandidate *= (1 + currentinflationRate);
+
+            double currentmoexImpacts = ratesData.moexImpacts().get(i);
             capital *= ratesData.moexImpacts().get(i);
         }
 
