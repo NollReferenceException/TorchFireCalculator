@@ -44,6 +44,28 @@ public class FireCalculator {
         return calculatedPercent;
     }
 
+    private boolean checkPercentForMaximality(double maxPercentCandidate, RatesData ratesData) {
+        calculatorStatistic.incrementChecksCount();
+
+        double capital = STARTING_CAPITAL_AMOUNT;
+
+        for (int i = 0; i < lifeYears; i++) {
+            capital -= maxPercentCandidate;
+
+            if (capital < 0) {
+                return false;
+            }
+
+            double currentinflationRate = ratesData.inflationRates().get(i);
+            maxPercentCandidate *= (1 + currentinflationRate);
+
+            double currentmoexImpacts = ratesData.moexImpacts().get(i);
+            capital *= ratesData.moexImpacts().get(i);
+        }
+
+        return true;
+    }
+
     private RatesData buildRatesData() {
         double currentMoexRate;
         ArrayList<Double> moexImpacts = new ArrayList<>();
@@ -88,28 +110,6 @@ public class FireCalculator {
         approximatePercent = Math.ceil(approximatePercent);
 
         return approximatePercent;
-    }
-
-    private boolean checkPercentForMaximality(double maxPercentCandidate, RatesData ratesData) {
-        calculatorStatistic.incrementChecksCount();
-
-        double capital = STARTING_CAPITAL_AMOUNT;
-
-        for (int i = 0; i < lifeYears; i++) {
-            capital -= maxPercentCandidate;
-
-            if (capital < 0) {
-                return false;
-            }
-
-            double currentinflationRate = ratesData.inflationRates().get(i);
-            maxPercentCandidate *= (1 + currentinflationRate);
-
-            double currentmoexImpacts = ratesData.moexImpacts().get(i);
-            capital *= ratesData.moexImpacts().get(i);
-        }
-
-        return true;
     }
 
     public CalculatorStatistic getStatistic() {
