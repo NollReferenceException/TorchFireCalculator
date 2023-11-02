@@ -3,14 +3,12 @@ package main;
 import java.util.ArrayList;
 
 public class ArgumentsParser {
-    private final int lowLimitYear;
-    private final int highLimitYear;
-    private final String[] srcArgs;
+    private final int LOW_LIMIT_YEAR = Constants.LOW_LIMIT_YEAR;
+    private final int HIGH_LIMIT_YEAR = Constants.HIGH_LIMIT_YEAR;
+    private final String[] sourceArgs;
 
     public ArgumentsParser(String[] args) {
-        lowLimitYear = Constants.LOW_LIMIT_YEAR;
-        highLimitYear = Constants.HIGH_LIMIT_YEAR;
-        srcArgs = args;
+        sourceArgs = args;
     }
 
     private ArrayList<Integer> validateArguments(String[] args) {
@@ -19,12 +17,12 @@ public class ArgumentsParser {
         for (String arg : args) {
             int year = Integer.valueOf(arg);
 
-            if ((lowLimitYear <= year) && (year <= highLimitYear)) {
+            if ((LOW_LIMIT_YEAR <= year) && (year <= HIGH_LIMIT_YEAR)) {
                 validatedArgs.add(year);
             } else {
                 throw new RuntimeException(
                         String.format("Значение должно находиться в пределах: от %d до %d",
-                                lowLimitYear, highLimitYear));
+                                LOW_LIMIT_YEAR, HIGH_LIMIT_YEAR));
             }
         }
 
@@ -32,6 +30,6 @@ public class ArgumentsParser {
     }
 
     public ArrayList<Integer> getValidatedArguments() {
-        return validateArguments(srcArgs);
+        return validateArguments(sourceArgs);
     }
 }

@@ -3,65 +3,51 @@ package main;
 import java.util.ArrayList;
 
 public class FireCalculator {
+    private final float STEP_VALUE = 0.5F;
+    private final double STARTING_CAPITAL_AMOUNT = Constants.MAX_PERCENT_VALUE;
 
-    private final double startingCapitalAmount;
-    private final float accuracyFactor;
-    private final float stepValue;
     private final int lifeYears;
     private final int startingIndexInflationRate;
     private final int startingIndexMoexRate;
-
-    private int cyclesCounter;
-    private float maxWithdrawalPercent;
-
-    ArrayList<Double> moexImpacts;
-    ArrayList<Double> inflationRates;
-
+    private final CalculatorStatistic calculatorStatistic;
 
     public FireCalculator(int chillYear, int highLimitYear) {
         lifeYears = (highLimitYear + 1) - chillYear;
         startingIndexInflationRate = (Constants.INFLATION_RATE.length - 1) - lifeYears;
         startingIndexMoexRate = (Constants.MOEX_RATE.length - 1) - lifeYears;
-
-        moexImpacts = new ArrayList<>();
-        inflationRates = new ArrayList<>();
-
-        startingCapitalAmount = Constants.MAX_PERCENT_VALUE;
-        cyclesCounter = 0;
-        stepValue = 0.5F;
-        accuracyFactor = 3.0F;
+        calculatorStatistic = new CalculatorStatistic();
     }
 
-    private float calculateMaxWithdrawalPercent() {
+    public double getMaxWithdrawalPercent() {
+        return calculateMaxWithdrawalPercent();
+    }
+
+    private double calculateMaxWithdrawalPercent() {
         if (lifeYears == 1) {
-            return (float) Constants.MAX_PERCENT_VALUE;
+            return Constants.MAX_PERCENT_VALUE;
         }
 
-        double calculatedPercent = calculateApproximatePercent();
+        RatesData ratesData = buildRatesData();
+        double calculatedPercent = calculateApproximatePercent(ratesData);
 
         boolean found;
         while (true) {
-            cyclesCounter++;
-
-            found = checkPercentForMaximality(calculatedPercent);
+            found = checkPercentForMaximality(calculatedPercent, ratesData);
 
             if (found) {
                 break;
             }
 
-            calculatedPercent -= stepValue;
+            calculatedPercent -= STEP_VALUE;
         }
 
-        maxWithdrawalPercent = (float) calculatedPercent;
-        return maxWithdrawalPercent;
+        return calculatedPercent;
     }
 
-    private double calculateApproximatePercent() {
-        double capital = startingCapitalAmount;
-        double moexImpact;
-        double approximatePercent = Constants.MAX_PERCENT_VALUE;
-        double currentInflationRate;
+    private RatesData buildRatesData() {
         double currentMoexRate;
+        ArrayList<Double> moexImpacts = new ArrayList<>();
+        ArrayList<Double> inflationRates = new ArrayList<>();
 
         if (startingIndexMoexRate == 0) {
             currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate];
@@ -70,32 +56,41 @@ public class FireCalculator {
         }
 
         for (int i = 0; i < lifeYears; i++) {
+            double currentInflationRate = (Constants.INFLATION_RATE[startingIndexInflationRate + i]
+                    / Constants.MAX_PERCENT_VALUE);
+            inflationRates.add(currentInflationRate);
+
+            double prevousMoexRate = currentMoexRate;
+            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate + i];
+            double moexImpact = (currentMoexRate / prevousMoexRate);
+            moexImpacts.add(moexImpact);
+        }
+
+        return new RatesData(moexImpacts, inflationRates);
+    }
+
+    private double calculateApproximatePercent(RatesData ratesData) {
+        double capital = STARTING_CAPITAL_AMOUNT;
+        double approximatePercent = Constants.MAX_PERCENT_VALUE;
+
+        for (int i = 0; i < lifeYears; i++) {
             if (i == (lifeYears - 1)) {
                 approximatePercent = (capital / (lifeYears));
             }
 
-            double prevousMoexRate = currentMoexRate;
-
-            currentInflationRate = (Constants.INFLATION_RATE[startingIndexInflationRate + i]
-                            / Constants.MAX_PERCENT_VALUE);
-
-            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate + i];
-
-            moexImpact = (currentMoexRate / prevousMoexRate);
-            capital -= (capital * currentInflationRate);
-            capital *= moexImpact;
-
-            inflationRates.add(currentInflationRate);
-            moexImpacts.add(moexImpact);
+            capital *= (1 - ratesData.inflationRates().get(i));
+            capital *= ratesData.moexImpacts().get(i);
         }
 
-        approximatePercent = Math.floor(approximatePercent + (accuracyFactor / lifeYears));
+        approximatePercent = Math.ceil(approximatePercent);
 
         return approximatePercent;
     }
 
-    private boolean checkPercentForMaximality(double maxPercentCandidate) {
-        double capital = startingCapitalAmount;
+    private boolean checkPercentForMaximality(double maxPercentCandidate, RatesData ratesData) {
+        calculatorStatistic.incrementCheckCount();
+
+        double capital = STARTING_CAPITAL_AMOUNT;
 
         for (int i = 0; i < lifeYears; i++) {
             capital -= maxPercentCandidate;
@@ -104,18 +99,14 @@ public class FireCalculator {
                 return false;
             }
 
-            maxPercentCandidate += (maxPercentCandidate * inflationRates.get(i));
-            capital *= moexImpacts.get(i);
+            maxPercentCandidate *= (1 + ratesData.inflationRates().get(i));
+            capital *= ratesData.moexImpacts().get(i);
         }
 
         return true;
     }
 
-    public float getMaxWithdrawalPercent() {
-        return calculateMaxWithdrawalPercent();
-    }
-
-    public int getCyclesCount() {
-        return cyclesCounter;
+    public CalculatorStatistic getStatistic() {
+        return calculatorStatistic;
     }
 }

@@ -42,7 +42,7 @@ class FireCalculatorTest {
             assertEquals(output, fireCalculator.getMaxWithdrawalPercent());
 
             System.out.printf("%d : количество проходов - %d%n",
-                    input, fireCalculator.getCyclesCount());
+                    input, fireCalculator.getStatistic().getChecksCount());
         }
     }
 }
