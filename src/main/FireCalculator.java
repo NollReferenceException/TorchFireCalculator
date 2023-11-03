@@ -56,35 +56,31 @@ public class FireCalculator {
                 return false;
             }
 
-            double currentinflationRate = ratesData.inflationRates().get(i);
+            double currentinflationRate = ratesData.inflationRates().get(i + 1);
             maxPercentCandidate *= (1 + currentinflationRate);
 
-            double currentmoexImpacts = ratesData.moexImpacts().get(i);
-            capital *= ratesData.moexImpacts().get(i);
+            double currentmoexImpacts = ratesData.moexImpacts().get(i + 1);
+            capital *= currentmoexImpacts;
         }
 
         return true;
     }
 
     private RatesData buildRatesData() {
-        double currentMoexRate;
         ArrayList<Double> moexImpacts = new ArrayList<>();
         ArrayList<Double> inflationRates = new ArrayList<>();
 
-        if (startingIndexMoexRate == 0) {
-            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate];
-        } else {
-            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate - 1];
-        }
+        double prevousMoexRate = Constants.MOEX_RATE[startingIndexMoexRate];
 
-        for (int i = 0; i < lifeYears; i++) {
-            double currentInflationRate = (Constants.INFLATION_RATE[startingIndexInflationRate + i]
+        for (int i = 0; i <= lifeYears; i++) {
+            double currentInflationRate = (Constants.INFLATION_RATE[startingIndexInflationRate + (i)]
                     / Constants.MAX_PERCENT_VALUE);
             inflationRates.add(currentInflationRate);
 
-            double prevousMoexRate = currentMoexRate;
-            currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate + i];
+            double currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate + (i)];
             double moexImpact = (currentMoexRate / prevousMoexRate);
+            prevousMoexRate = currentMoexRate;
+
             moexImpacts.add(moexImpact);
         }
 
@@ -100,10 +96,10 @@ public class FireCalculator {
                 approximatePercent = (capital / (lifeYears));
             }
 
-            double currentinflationRate = ratesData.inflationRates().get(i);
+            double currentinflationRate = ratesData.inflationRates().get(i + 1);
             capital *= (1 - currentinflationRate);
 
-            double currentmoexImpacts = ratesData.moexImpacts().get(i);
+            double currentmoexImpacts = ratesData.moexImpacts().get(i + 1);
             capital *= currentmoexImpacts;
         }
 
