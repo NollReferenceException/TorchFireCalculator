@@ -37,7 +37,7 @@ class FireCalculatorTest {
     public void fullTest(int input, float output) {
         {
             FireCalculator fireCalculator =
-                    new FireCalculator(input, Constants.HIGH_LIMIT_YEAR);
+                    new FireCalculator(input);
 
             assertEquals(output, fireCalculator.getMaxWithdrawalPercent());
 

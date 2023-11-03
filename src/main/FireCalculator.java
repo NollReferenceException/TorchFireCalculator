@@ -1,20 +1,17 @@
 package main;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FireCalculator {
     private final float STEP_VALUE = 0.5F;
     private final double STARTING_CAPITAL_AMOUNT = Constants.MAX_PERCENT_VALUE;
-
+    private final int retirementYear;
     private final int lifeYears;
-    private final int startingIndexInflationRate;
-    private final int startingIndexMoexRate;
     private final CalculatorStatistic calculatorStatistic;
 
-    public FireCalculator(int chillYear, int highLimitYear) {
-        lifeYears = (highLimitYear + 1) - chillYear;
-        startingIndexInflationRate = (Constants.INFLATION_RATE.length - 1) - lifeYears;
-        startingIndexMoexRate = (Constants.MOEX_RATE.length - 1) - lifeYears;
+    public FireCalculator(int retirementYear) {
+        this.retirementYear = retirementYear;
+        lifeYears = (Constants.HIGH_LIMIT_YEAR + 1) - retirementYear;
         calculatorStatistic = new CalculatorStatistic();
     }
 
@@ -27,7 +24,7 @@ public class FireCalculator {
             return Constants.MAX_PERCENT_VALUE;
         }
 
-        RatesData ratesData = buildRatesData();
+        RatesData ratesData = new RatesData(retirementYear, lifeYears);
         double calculatedPercent = calculateApproximatePercent(ratesData);
 
         boolean found;
@@ -56,35 +53,14 @@ public class FireCalculator {
                 return false;
             }
 
-            double currentinflationRate = ratesData.inflationRates().get(i + 1);
+            double currentinflationRate = ratesData.inflationRates().get(retirementYear + i + 1);
             maxPercentCandidate *= (1 + currentinflationRate);
 
-            double currentmoexImpacts = ratesData.moexImpacts().get(i + 1);
+            double currentmoexImpacts = ratesData.moexImpacts().get(retirementYear + i);
             capital *= currentmoexImpacts;
         }
 
         return true;
-    }
-
-    private RatesData buildRatesData() {
-        ArrayList<Double> moexImpacts = new ArrayList<>();
-        ArrayList<Double> inflationRates = new ArrayList<>();
-
-        double prevousMoexRate = Constants.MOEX_RATE[startingIndexMoexRate];
-
-        for (int i = 0; i <= lifeYears; i++) {
-            double currentInflationRate = (Constants.INFLATION_RATE[startingIndexInflationRate + (i)]
-                    / Constants.MAX_PERCENT_VALUE);
-            inflationRates.add(currentInflationRate);
-
-            double currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate + (i)];
-            double moexImpact = (currentMoexRate / prevousMoexRate);
-            prevousMoexRate = currentMoexRate;
-
-            moexImpacts.add(moexImpact);
-        }
-
-        return new RatesData(moexImpacts, inflationRates);
     }
 
     private double calculateApproximatePercent(RatesData ratesData) {
@@ -96,10 +72,10 @@ public class FireCalculator {
                 approximatePercent = (capital / (lifeYears));
             }
 
-            double currentinflationRate = ratesData.inflationRates().get(i + 1);
+            double currentinflationRate = ratesData.inflationRates().get(retirementYear + i);
             capital *= (1 - currentinflationRate);
 
-            double currentmoexImpacts = ratesData.moexImpacts().get(i + 1);
+            double currentmoexImpacts = ratesData.moexImpacts().get(retirementYear + i);
             capital *= currentmoexImpacts;
         }
 

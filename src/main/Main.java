@@ -16,8 +16,7 @@ public class Main {
             ArgumentsParser argumentsParser = new ArgumentsParser(new String[]{s});
             ArrayList<Integer> validatedYears = argumentsParser.getValidatedArguments();
 
-            FireCalculator fireCalculator = new FireCalculator(validatedYears.get(0),
-                    Constants.HIGH_LIMIT_YEAR);
+            FireCalculator fireCalculator = new FireCalculator(validatedYears.get(0));
 
             System.out.println(fireCalculator.getMaxWithdrawalPercent());
         } catch (RuntimeException | IOException e) {
