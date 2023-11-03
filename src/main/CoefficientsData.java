@@ -2,11 +2,11 @@ package main;
 
 import java.util.HashMap;
 
-public final class RatesData {
+public final class CoefficientsData {
     private final HashMap<Integer, Double> moexImpacts;
     private final HashMap<Integer, Double> inflationRates;
 
-    public RatesData(int retirementYear, int lifeYears) {
+    public CoefficientsData(int retirementYear, int lifeYears) {
         moexImpacts = new HashMap<>();
         inflationRates = new HashMap<>();
 
@@ -31,11 +31,11 @@ public final class RatesData {
         }
     }
 
-    public HashMap<Integer, Double> moexImpacts() {
+    public HashMap<Integer, Double> moexCoefficients() {
         return moexImpacts;
     }
 
-    public HashMap<Integer, Double> inflationRates() {
+    public HashMap<Integer, Double> inflationCoefficients() {
         return inflationRates;
     }
 }
