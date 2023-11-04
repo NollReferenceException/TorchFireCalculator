@@ -4,12 +4,10 @@ public class FireCalculator {
     private final float STEP_VALUE = 0.5F;
     private final double STARTING_CAPITAL_AMOUNT = Constants.MAX_PERCENT_VALUE;
     private final int retirementYear;
-    private final int lifeYears;
     private final CalculatorStatistic calculatorStatistic;
 
     public FireCalculator(int retirementYear) {
         this.retirementYear = retirementYear;
-        lifeYears = (Constants.HIGH_LIMIT_YEAR + 1) - retirementYear;
         calculatorStatistic = new CalculatorStatistic();
     }
 
@@ -18,11 +16,9 @@ public class FireCalculator {
     }
 
     private double calculateMaxWithdrawalPercent() {
-        if (lifeYears == 1) {
-            return Constants.MAX_PERCENT_VALUE;
-        }
+        CoefficientsData coefficientsData = new CoefficientsData();
+        coefficientsData.buildRatesData();
 
-        CoefficientsData coefficientsData = new CoefficientsData(retirementYear, lifeYears);
         double calculatedPercent = calculateApproximatePercent(coefficientsData);
 
         boolean found;
@@ -44,18 +40,18 @@ public class FireCalculator {
 
         double capital = STARTING_CAPITAL_AMOUNT;
 
-        for (int i = 0; i < lifeYears; i++) {
+        for (int currYear = retirementYear; currYear < Constants.HIGH_LIMIT_YEAR; currYear++) {
             capital -= maxPercentCandidate;
 
-            if (capital < 0) {
-                return false;
-            }
-
-            double inflationCoef = coefficientsData.inflationCoefficients().get(retirementYear + i + 1);
+            double inflationCoef = coefficientsData.inflationCoefficients().get(currYear + 1);
             maxPercentCandidate *= (1 + inflationCoef);
 
-            double moexCoef = coefficientsData.moexCoefficients().get(retirementYear + i);
+            double moexCoef = coefficientsData.moexCoefficients().get(currYear);
             capital *= moexCoef;
+
+            if (capital < maxPercentCandidate) {
+                return false;
+            }
         }
 
         return true;
@@ -63,21 +59,16 @@ public class FireCalculator {
 
     private double calculateApproximatePercent(CoefficientsData coefficientsData) {
         double capital = STARTING_CAPITAL_AMOUNT;
-        double approximatePercent = Constants.MAX_PERCENT_VALUE;
 
-        for (int i = 0; i < lifeYears; i++) {
-            if (i == (lifeYears - 1)) {
-                approximatePercent = (capital / (lifeYears));
-            }
+        for (int currYear = retirementYear; currYear < Constants.HIGH_LIMIT_YEAR; currYear++) {
+            double moexCoef = coefficientsData.moexCoefficients().get(currYear);
+            double inflationCoef = coefficientsData.inflationCoefficients().get(currYear);
 
-            double currentinflationRate = coefficientsData.inflationCoefficients().get(retirementYear + i);
-            capital *= (1 - currentinflationRate);
-
-            double currentmoexImpacts = coefficientsData.moexCoefficients().get(retirementYear + i);
-            capital *= currentmoexImpacts;
+            capital *= (moexCoef * (1 - inflationCoef));
         }
 
-        approximatePercent = Math.ceil(approximatePercent);
+        double approximatePercent = (capital / ((Constants.HIGH_LIMIT_YEAR + 1) - retirementYear));
+        approximatePercent = (int) approximatePercent;
 
         return approximatePercent;
     }

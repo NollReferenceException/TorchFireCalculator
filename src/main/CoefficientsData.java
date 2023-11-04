@@ -3,39 +3,36 @@ package main;
 import java.util.HashMap;
 
 public final class CoefficientsData {
-    private final HashMap<Integer, Double> moexImpacts;
-    private final HashMap<Integer, Double> inflationRates;
+    private final HashMap<Integer, Double> moexCoefficients;
+    private final HashMap<Integer, Double> inflationCoefficients;
 
-    public CoefficientsData(int retirementYear, int lifeYears) {
-        moexImpacts = new HashMap<>();
-        inflationRates = new HashMap<>();
-
-        buildRatesData(retirementYear, lifeYears);
+    public CoefficientsData() {
+        moexCoefficients = new HashMap<>();
+        inflationCoefficients = new HashMap<>();
     }
 
-    private void buildRatesData(int retirementYear, int lifeYears) {
-        int startingIndexInflationRate = (Constants.INFLATION_RATE.length - 1) - lifeYears;
-        int startingIndexMoexRate = (Constants.MOEX_RATE.length - 1) - lifeYears;
+    public void buildRatesData() {
+        int yearCount = Constants.HIGH_LIMIT_YEAR - Constants.LOW_LIMIT_YEAR;
 
-        double prevousMoexRate = Constants.MOEX_RATE[startingIndexMoexRate];
+        double prevousMoexRate = Constants.MOEX_RATE[0];
 
-        for (int i = 0; i <= lifeYears; i++) {
-            double currentInflationRate = (Constants.INFLATION_RATE[startingIndexInflationRate + (i)]
+        for (int i = 0; i <= yearCount; i++) {
+            double currentInflationRate = (Constants.INFLATION_RATE[(i)]
                     / Constants.MAX_PERCENT_VALUE);
-            inflationRates.put((retirementYear + i), currentInflationRate);
+            inflationCoefficients.put(Constants.LOW_LIMIT_YEAR + i, currentInflationRate);
 
-            double currentMoexRate = Constants.MOEX_RATE[startingIndexMoexRate + (i)];
+            double currentMoexRate = Constants.MOEX_RATE[(i)];
             double moexImpact = (currentMoexRate / prevousMoexRate);
             prevousMoexRate = currentMoexRate;
-            moexImpacts.put(((retirementYear + i) - 1), moexImpact);
+            moexCoefficients.put((Constants.LOW_LIMIT_YEAR + i) - 1, moexImpact);
         }
     }
 
     public HashMap<Integer, Double> moexCoefficients() {
-        return moexImpacts;
+        return moexCoefficients;
     }
 
     public HashMap<Integer, Double> inflationCoefficients() {
-        return inflationRates;
+        return inflationCoefficients;
     }
 }
