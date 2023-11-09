@@ -40,7 +40,6 @@ public class FireCalculator {
     }
 
     private boolean checkPercentForMaximality(double maxPercentCandidate) {
-
         double capital = STARTING_CAPITAL_AMOUNT;
 
         int currYear = retirementYear;

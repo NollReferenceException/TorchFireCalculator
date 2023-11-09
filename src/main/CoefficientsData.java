@@ -31,10 +31,10 @@ public class CoefficientsData {
     }
 
     public HashMap<Integer, Double> moexCoefficients() {
-        return moexCoefficients;
+        return new HashMap<>(moexCoefficients);
     }
 
     public HashMap<Integer, Double> inflationCoefficients() {
-        return inflationCoefficients;
+        return new HashMap<>(inflationCoefficients);
     }
 }
