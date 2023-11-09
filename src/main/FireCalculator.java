@@ -43,7 +43,10 @@ public class FireCalculator {
 
         double capital = STARTING_CAPITAL_AMOUNT;
 
-        for (int currYear = retirementYear; currYear < Constants.HIGH_LIMIT_YEAR; currYear++) {
+        int currYear = retirementYear;
+        boolean valid = true;
+
+        while (valid && (currYear < Constants.HIGH_LIMIT_YEAR)) {
             capital -= maxPercentCandidate;
 
             double inflationCoef = coefficientsData.inflationCoefficients().get(currYear + 1);
@@ -53,11 +56,13 @@ public class FireCalculator {
             capital *= moexCoef;
 
             if (capital < maxPercentCandidate) {
-                return false;
+                valid = false;
             }
+
+            currYear++;
         }
 
-        return true;
+        return valid;
     }
 
     private double calculateApproximatePercent() {
