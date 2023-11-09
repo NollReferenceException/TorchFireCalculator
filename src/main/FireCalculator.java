@@ -5,10 +5,12 @@ public class FireCalculator {
     private final double STARTING_CAPITAL_AMOUNT = Constants.MAX_PERCENT_VALUE;
     private final int retirementYear;
     private final CalculatorStatistic calculatorStatistic;
+    private final CoefficientsData coefficientsData;
 
     public FireCalculator(int retirementYear) {
         this.retirementYear = retirementYear;
         calculatorStatistic = new CalculatorStatistic();
+        coefficientsData = new CoefficientsData();
     }
 
     public double getMaxWithdrawalPercent() {
@@ -16,27 +18,28 @@ public class FireCalculator {
     }
 
     private double calculateMaxWithdrawalPercent() {
-        CoefficientsData coefficientsData = new CoefficientsData();
-        coefficientsData.buildRatesData();
+        double calculatedPercent = calculateApproximatePercent();
 
-        double calculatedPercent = calculateApproximatePercent(coefficientsData);
+        int maxIterationCount = (int) (Constants.MAX_PERCENT_VALUE / STEP_VALUE);
+        int i = 0;
+        boolean found = false;
 
-        boolean found;
-        while (true) {
-            found = checkPercentForMaximality(calculatedPercent, coefficientsData);
-
-            if (found) {
-                break;
+        while (!found && (i < maxIterationCount)) {
+            if (checkPercentForMaximality(calculatedPercent)) {
+                found = true;
+            } else {
+                calculatedPercent -= STEP_VALUE;
             }
 
-            calculatedPercent -= STEP_VALUE;
+            i++;
         }
+
+        calculatorStatistic.setChecksCount(i);
 
         return calculatedPercent;
     }
 
-    private boolean checkPercentForMaximality(double maxPercentCandidate, CoefficientsData coefficientsData) {
-        calculatorStatistic.incrementChecksCount();
+    private boolean checkPercentForMaximality(double maxPercentCandidate) {
 
         double capital = STARTING_CAPITAL_AMOUNT;
 
@@ -57,7 +60,7 @@ public class FireCalculator {
         return true;
     }
 
-    private double calculateApproximatePercent(CoefficientsData coefficientsData) {
+    private double calculateApproximatePercent() {
         double capital = STARTING_CAPITAL_AMOUNT;
 
         for (int currYear = retirementYear; currYear < Constants.HIGH_LIMIT_YEAR; currYear++) {

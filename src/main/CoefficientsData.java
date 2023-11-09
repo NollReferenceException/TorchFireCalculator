@@ -2,13 +2,15 @@ package main;
 
 import java.util.HashMap;
 
-public final class CoefficientsData {
+public class CoefficientsData {
     private final HashMap<Integer, Double> moexCoefficients;
     private final HashMap<Integer, Double> inflationCoefficients;
 
     public CoefficientsData() {
         moexCoefficients = new HashMap<>();
         inflationCoefficients = new HashMap<>();
+
+        buildRatesData();
     }
 
     public void buildRatesData() {
